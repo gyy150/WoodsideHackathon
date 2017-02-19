@@ -1,0 +1,138 @@
+---
+title: "Hackathon"
+author: "Team 5"
+date: "18 February 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(openxlsx)
+library(corrplot)
+library(leaps)
+library(knitr)
+library(data.table)
+library("forecast")
+
+```
+
+```{r, cache=TRUE}
+AllVariables <- (read.xlsx("HackathonS.xlsx", sheet = 1,startRow = 1, colNames = TRUE))[-1,]
+Taiwan       <- (read.xlsx("HackathonS.xlsx", sheet =2, startRow = 1, colNames = TRUE))
+Korea        <- (read.xlsx("HackathonS.xlsx", sheet =3, startRow = 1, colNames = TRUE))
+Japan        <- (read.xlsx("HackathonS.xlsx", sheet =4, startRow = 1, colNames = TRUE))
+China        <- (read.xlsx("HackathonS.xlsx", sheet =5, startRow = 1, colNames = TRUE))
+
+
+
+```
+
+#Korea
+```{r, cache=TRUE}
+plot(Korea)
+corrplot(cor(Korea), type = "upper", tl.pos = "td", method = "circle", tl.cex = 0.5, tl.col = 'black', order = "hclust", diag = TRUE)
+```
+#korea spot reference
+```{r, cache=TRUE}
+#AllSub <- regsubsets(`Asian.Spot.Reference.Price.(US$/MMBtu)`~., data = Korea)
+#AllSub.summary <- summary(AllSub)
+#AllSub.outmat <- AllSub.summary$outmat
+#kable(AllSub.outmat)
+```
+
+```{r}
+AllSub <- regsubsets(`Korea.LNG.imports.(Source:.Korean.Gov.Statistics).(Ktoe)`~., data = Korea)
+AllSub.summary <- summary(AllSub)
+AllSub.outmat <- AllSub.summary$outmat
+kable(AllSub.outmat)
+```
+
+```{r}
+Korea.lm <- lm(`Korea.LNG.imports.(Source:.Korean.Gov.Statistics).(Ktoe)`~`Korea.LNG.import.value.(US$.million)`, data = Korea)
+plot(Korea.lm)
+```
+
+```{r}
+names(Taiwan)
+
+for(n in 1:1 ){
+  
+  a <- Taiwan[n]
+
+  a_timeseries <- ts(a, frequency=4, start=c(2009,2))
+  
+  plot.ts(a_timeseries)
+  
+  a_timeseries_component <- decompose(a_timeseries)
+  
+  plot(a_timeseries_component)
+  
+  
+  a_adjusted <- a_timeseries - a_timeseries_component$seasonal
+
+  plot(a_adjusted)
+
+  a_forecast <- HoltWinters(a_timeseries)
+
+  plot(a_forecast)
+
+  a_forecasts_2 <- forecast.HoltWinters(a_forecast, h=4)
+
+  plot.forecast( a_forecasts_2 )
+
+  plot.ts(a_forecasts_2$residuals)            # make a time plot
+  #plotForecastErrors(a_forecasts_2$residuals) # make a histogram
+
+  a_timeseries_diff_1 <- diff(a_timeseries, differences=1)
+
+  plot.ts(a_timeseries_diff_1)
+
+}
+```
+```{r}
+
+names(Korea)
+
+for(n in 2:16 ){
+  
+  a <- Korea[n]
+
+  a_timeseries <- ts(a, frequency=4, start=c(2009,2))
+
+  plot.ts(a_timeseries)
+
+  a_timeseries_component <- decompose(a_timeseries)
+
+  plot(a_timeseries_component)
+  
+  
+  # a_adjusted <- a_timeseries - a_timeseries_component$seasonal
+  # 
+  # plot(a_adjusted)
+  # 
+  # a_forecast <- HoltWinters(a_timeseries)
+  # 
+  # plot(a_forecast)
+  # 
+  # a_forecasts_2 <- forecast.HoltWinters(a_forecast, h=4)
+  #  
+  # plot.forecast( a_forecasts_2 )
+  # 
+  # plot.ts(a_forecasts_2$residuals)            # make a time plot
+  # #plotForecastErrors(a_forecasts_2$residuals) # make a histogram
+  # 
+  # a_timeseries_diff_1 <- diff(a_timeseries, differences=1)
+  # 
+  # plot.ts(a_timeseries_diff_1)
+
+}
+```
+
+Show in New WindowClear OutputExpand/Collapse Output
+package ???data.table??? was built under R version 3.3.2data.table 1.10.4
+  The fastest way to learn (by data.table authors): https://www.datacamp.com/courses/data-analysis-the-data-table-way
+  Documentation: ?data.table, example(data.table) and browseVignettes("data.table")
+  Release notes, videos and slides: http://r-datatable.com
+Show in New WindowClear OutputExpand/Collapse Output
+R Console
+

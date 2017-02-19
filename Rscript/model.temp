@@ -1,0 +1,49 @@
+model
+{
+  beta0 ~ dnorm(0, 1/1000^2)
+  beta1 ~ dnorm(0, 1/1000^2)
+#  beta2 ~ dnorm(0, 1/1000^2)
+#  beta3 ~ dnorm(0, 1/1000^2)
+#  beta4 ~ dnorm(0, 1/1000^2)
+#  beta5 ~ dnorm(0, 1/1000^2)
+  beta6 ~ dnorm(0, 1/1000^2)
+#  beta7 ~ dnorm(0, 1/1000^2)  
+
+  log_sigma ~ dunif(-5, 5)
+  sigma <- exp(log_sigma)
+
+  for(i in 1:N)
+  {
+        mu[i] <-  beta0 
+                  + beta1*x1[i] 
+#                  + beta2*x2[i] 
+#                  + beta3*x3[i]
+#                  + beta4*x4[i]
+#                  + beta5*x5[i] 
+                  + beta6*x6[i] 
+#                  + beta7*x7[i]
+        y[i]  ~  dnorm(mu[i], 1/sigma^2)
+  }
+  
+  ########################  currently using 2015 q4 value for testing
+  TW_emplyment_2016_q1           = 11234
+#  TW_exchange_rate_2016_q1       = 33.132
+#  TW_GDP_2016_q1                 = 93873
+#  TW_gas_coal_price_diff_2016_q1 = -16.203
+#  TW_primary_energy_2016_q1      = 113.522
+  TW_Cooling_Degree_Days_2016_q1    = 744
+  
+  ########################
+
+  y_new ~ dnorm(
+                      beta0 
+                       + beta1 * TW_emplyment_2016_q1
+#                      + beta2 * TW_exchange_rate_2016_q1 
+#                      + beta3 * TW_GDP_2016_q1 
+#                      + beta4 * TW_gas_coal_price_diff_2016_q1 
+#                      + beta5 * TW_primary_energy_2016_q1
+                       + beta6 * TW_Cooling_Degree_Days_2016_q1
+                  ,   1/sigma^2)
+
+}
+
