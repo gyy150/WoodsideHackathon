@@ -1,0 +1,35 @@
+page 30 onwards LNG pricing 
+
+JKM spot price benchmark for LNG
+
+only data given for jap, korea, taiwan china
+
+individual model for each coutry, then group together then feed to other downsteam stuff
+
+some data already factored in other data, like the LNG demand is alraedy a reflection of temerature data, so temperature data is not required 
+
+
+
+south korea domestic gas demand last entry, data is wrong 
+
+additive model, use decompose() in R
+
+
+then can use forecast.HoltWinters() and stuff to predict?
+
+
+If you have a time series that can be described using an additive model with constant level and no seasonality, 
+you can use simple exponential smoothing to make short-term forecasts.
+
+Holt’s Exponential Smoothing
+If you have a time series that can be described using an additive model with increasing or decreasing trend and no seasonality, 
+you can use Holt’s exponential smoothing to make short-term forecasts.
+
+
+Holt-Winters Exponential Smoothing
+If you have a time series that can be described using an additive model with increasing or decreasing trend and seasonality,
+ you can use Holt-Winters exponential smoothing to make short-term forecasts.
+
+
+cooling degree day
+a measure of how much engery is needed for heating of cooling 

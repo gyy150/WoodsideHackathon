@@ -1,0 +1,206 @@
+---
+title: "Hackathon"
+author: "Team 5"
+date: "18 February 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+setwd("C:/Users/young/Desktop/work/Woodside_Hackathon/Rscript")
+
+knitr::opts_chunk$set(echo = TRUE)
+library(openxlsx)
+library(corrplot)
+library(leaps)
+library(knitr)
+library(data.table)
+library("forecast")
+
+```
+
+```{r, cache=TRUE}
+AllVariables <- (read.xlsx("HackathonS.xlsx", sheet = 1,startRow = 1, colNames = TRUE))[-1,]
+Taiwan       <- (read.xlsx("HackathonS.xlsx", sheet =2, startRow = 1, colNames = TRUE))
+Korea        <- (read.xlsx("HackathonS.xlsx", sheet =3, startRow = 1, colNames = TRUE))
+Japan        <- (read.xlsx("HackathonS.xlsx", sheet =4, startRow = 1, colNames = TRUE))
+China        <- (read.xlsx("HackathonS.xlsx", sheet =5, startRow = 1, colNames = TRUE))
+
+
+
+```
+
+#Korea
+```{r, cache=TRUE}
+plot(Korea)
+corrplot(cor(Korea), type = "upper", tl.pos = "td", method = "circle", tl.cex = 0.5, tl.col = 'black', order = "hclust", diag = TRUE)
+```
+#korea spot reference
+```{r, cache=TRUE}
+#AllSub <- regsubsets(`Asian.Spot.Reference.Price.(US$/MMBtu)`~., data = Korea)
+#AllSub.summary <- summary(AllSub)
+#AllSub.outmat <- AllSub.summary$outmat
+#kable(AllSub.outmat)
+```
+
+```{r}
+AllSub <- regsubsets(`Korea.LNG.imports.(Source:.Korean.Gov.Statistics).(Ktoe)`~., data = Korea)
+AllSub.summary <- summary(AllSub)
+AllSub.outmat <- AllSub.summary$outmat
+kable(AllSub.outmat)
+```
+
+```{r}
+Korea.lm <- lm(`Korea.LNG.imports.(Source:.Korean.Gov.Statistics).(Ktoe)`~`Korea.LNG.import.value.(US$.million)`, data = Korea)
+plot(Korea.lm)
+```
+
+```{r}
+names(Taiwan)
+
+for(n in 8:8 ){
+  
+  a <- Taiwan[n]
+
+  a_timeseries <- ts(a, frequency=4, start=c(2009,2))
+  
+  plot.ts(a_timeseries)
+  
+  a_timeseries_component <- decompose(a_timeseries)
+  
+  plot(a_timeseries_component)
+  
+
+  a_adjusted <- a_timeseries - a_timeseries_component$seasonal
+
+  plot(a_adjusted)
+
+  a_forecast <- HoltWinters(a_timeseries)
+
+  plot(a_forecast)
+
+  a_forecasts_2 <- forecast.HoltWinters(a_forecast, h=4)
+
+  plot.forecast( a_forecasts_2 )
+
+  plot.ts(a_forecasts_2$residuals)            # make a time plot
+  
+  # #plotForecastErrors(a_forecasts_2$residuals) # make a histogram
+  # 
+  # a_timeseries_diff_1 <- diff(a_timeseries, differences=1)
+  # 
+  # plot.ts(a_timeseries_diff_1)
+
+}
+```
+```{r}
+
+names(Korea)
+
+for(n in c(10) ){
+  
+  a <- Korea[n]
+
+  a_timeseries <- ts(a, frequency=4, start=c(2009,2))
+
+  plot.ts(a_timeseries , main = names(Korea)[n])
+
+  a_timeseries_component <- decompose(a_timeseries)
+
+  plot(a_timeseries_component$trend , main = names(Korea)[n])
+  
+  
+  
+  
+  a_adjusted <- a_timeseries - a_timeseries_component$seasonal
+
+  plot(a_adjusted)
+
+  a_forecast <- HoltWinters(a_timeseries)
+
+  plot(a_forecast)
+
+  a_forecasts_2 <- forecast.HoltWinters(a_forecast, h=4)
+
+  plot.forecast( a_forecasts_2 )
+
+  plot.ts(a_forecasts_2$residuals)            # make a time plot
+  #plotForecastErrors(a_forecasts_2$residuals) # make a histogram
+
+  a_timeseries_diff_1 <- diff(a_timeseries, differences=1)
+
+  plot.ts(a_timeseries_diff_1)
+
+}
+```
+
+```{r}
+employment              = Korea[,1]
+exchange_rate          = Korea[,2]
+GDP                    = Korea[,3]
+gas_coal_price_diff    = Korea[,7] - Korea[,8]
+primary_energy         = Korea[,29]
+Cooling_Degree_Days    = Korea[,31]
+Heating_Degree_Days    = Korea[,30]
+Nuclear_total_energy   = Korea[,24]
+
+#considered to be irrelevant 
+domestic_demand     = Korea[,9]
+
+#to be forecasted
+LNG_import          = Korea[,11] 
+
+a <- Cooling_Degree_Days + Heating_Degree_Days
+a_timeseries <- ts(a, frequency=4, start=c(2009,2))
+a_timeseries_component <- decompose(a_timeseries)
+plot.ts(a_timeseries)
+
+
+b <- Cooling_Degree_Days 
+b_timeseries <- ts(b, frequency=4, start=c(2009,2))
+b_timeseries_component <- decompose(b_timeseries)
+plot.ts(b_timeseries)
+
+# plot(LNG_import ~ domestic_demand  )
+# 
+# plot(  a_timeseries_component$trend[17:27] ~ Nuclear_total_energy[17:27]  )
+
+```
+
+```{r}
+
+names(China)
+
+for(n in c(1:14) ){
+  
+  a <- China[n]
+
+  a_timeseries <- ts(a, frequency=4, start=c(2009,2))
+
+  plot.ts(a_timeseries , main = names(China)[n])
+
+  a_timeseries_component <- decompose(a_timeseries)
+
+  plot(a_timeseries_component$trend , main = names(China)[n])
+  
+  #a_adjusted <- a_timeseries - a_timeseries_component$seasonal
+
+  #plot(a_adjusted)
+
+  #a_forecast <- HoltWinters(a_timeseries)
+
+  #plot(a_forecast)
+
+  #a_forecasts_2 <- forecast.HoltWinters(a_forecast, h=4)
+
+  #plot.forecast( a_forecasts_2 )
+
+  #plot.ts(a_forecasts_2$residuals)            # make a time plot
+  #plotForecastErrors(a_forecasts_2$residuals) # make a histogram
+
+  #a_timeseries_diff_1 <- diff(a_timeseries, differences=1)
+
+  #plot.ts(a_timeseries_diff_1)
+
+}
+
+```
